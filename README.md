@@ -26,6 +26,10 @@ arXiv preprint, 2024
 </div>
 
 ## 🔆 Introduction
+
+🔥🔥🔥 **DepthCrafter** is released now, have fun!
+
+
 🤗 DepthCrafter can generate temporally consistent long depth sequences with fine-grained details for open-world videos, 
 without requiring additional information such as camera poses or optical flow.
 
