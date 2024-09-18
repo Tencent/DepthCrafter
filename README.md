@@ -27,7 +27,8 @@ arXiv preprint, 2024
 
 ## 🔆 Introduction
 
-🔥🔥🔥 **DepthCrafter** is released now, have fun!
+- [24-9-18] Add point cloud sequence visualization.
+- [24-9-14] 🔥🔥🔥 **DepthCrafter** is released now, have fun!
 
 
 🤗 DepthCrafter can generate temporally consistent long depth sequences with fine-grained details for open-world videos, 
