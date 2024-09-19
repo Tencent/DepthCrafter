@@ -1,8 +1,7 @@
 """Record3D visualizer
 """
-import os
+
 import time
-from pathlib import Path
 from decord import VideoReader, cpu
 
 import numpy as np
@@ -14,24 +13,23 @@ from tqdm.auto import tqdm
 
 
 def main(
-    data_path: str = "/apdcephfs_cq10/share_1290939/vg_share/reynli/cache/video_demo/video_depth",
-    vid_name: str = "01_dog",
+    data_path: str,
+    vid_name: str,
     downsample_factor: int = 8,
     max_frames: int = 100,
     share: bool = False,
-    point_size = 0.01
+    point_size=0.01,
 ) -> None:
-    
+
     server = viser.ViserServer()
     if share:
         server.request_share_url()
 
     print("Loading frames!")
-    dis_path = data_path + '/' + vid_name + '.npz'
-    vid_path = data_path + '/' + vid_name + '_rgb.mp4'
-    # vid_path = data_path + '/' + vid_name + '.mp4'
-    
-    disp_map = np.load(dis_path)['depth'][:, :, :]
+    dis_path = data_path + "/" + vid_name + ".npz"
+    vid_path = data_path + "/" + vid_name + "_input.mp4"
+
+    disp_map = np.load(dis_path)["depth"][:, :, :]
     T = disp_map.shape[0]
     H = disp_map.shape[1]
     W = disp_map.shape[2]
@@ -111,19 +109,19 @@ def main(
 
         # Add base frame.
         frame_nodes.append(server.scene.add_frame(f"/frames/t{i}", show_axes=False))
-        
+
         position_image = np.where(np.zeros([H, W]) == 0)
-        v = np.array(position_image[0]) 
-        u = np.array(position_image[1]) 
+        v = np.array(position_image[0])
+        u = np.array(position_image[1])
         d = disp_map[i, v, u]
 
         zc = 1.0 / (d + 0.1)
         # zc = 1.0 / (d + 1e-8)
-    
-        xc = zc * (u - (W / 2.0)) / (W/2.)
-        yc = zc * (v - (H / 2.0)) / (H/2.)
 
-        zc -= 4 # disp_max * 0.2
+        xc = zc * (u - (W / 2.0)) / (W / 2.0)
+        yc = zc * (v - (H / 2.0)) / (H / 2.0)
+
+        zc -= 4  # disp_max * 0.2
 
         points = np.stack((xc, yc, zc), axis=1)
         colors = vid[i, v, u]
@@ -136,7 +134,7 @@ def main(
             name=f"/frames/t{i}/point_cloud",
             points=points,
             colors=colors,
-            point_size=point_size,#0.007,
+            point_size=point_size,  # 0.007,
             point_shape="rounded",
         )
 
@@ -154,13 +152,15 @@ def main(
 
 
 if __name__ == "__main__":
-    tyro.cli(main(
-        # dir path of saved rgb.mp4 and disp.npz, modify it to your own dir
-        data_path="outputs/results_open_world/",
-        # sample name, modify it to your own sample name
-        vid_name="wukong",
-        # downsample factor of dense pcd
-        downsample_factor=8,
-        # point cloud size
-        point_size=0.007
-    ))
+    tyro.cli(
+        main(
+            # dir path of saved rgb.mp4 and disp.npz, modify it to your own dir
+            data_path="./demo_output",
+            # sample name, modify it to your own sample name
+            vid_name="example_01",
+            # downsample factor of dense pcd
+            downsample_factor=8,
+            # point cloud size
+            point_size=0.007,
+        )
+    )

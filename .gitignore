@@ -167,3 +167,5 @@ cython_debug/
 *__pycache__
 scripts/
 eval/
+*.DS_Store
+benchmark/datasets

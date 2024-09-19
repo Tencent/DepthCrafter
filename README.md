@@ -27,6 +27,7 @@ arXiv preprint, 2024
 
 ## 🔆 Introduction
 
+- [24-9-19] Add scripts for preparing benchmark datasets. 
 - [24-9-18] Add point cloud sequence visualization.
 - [24-9-14] 🔥🔥🔥 **DepthCrafter** is released now, have fun!
 
