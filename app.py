@@ -138,4 +138,5 @@ demo = construct_demo()
 
 if __name__ == "__main__":
     demo.queue()
-    demo.launch(server_name="0.0.0.0", server_port=80, debug=True)
+    # demo.launch(server_name="0.0.0.0", server_port=80, debug=True)
+    demo.launch(share=True)
