@@ -22,7 +22,6 @@ examples = [
 
 unet = DiffusersUNetSpatioTemporalConditionModelDepthCrafter.from_pretrained(
     "tencent/DepthCrafter",
-    subfolder="unet",
     low_cpu_mem_usage=True,
     torch_dtype=torch.float16,
 )
@@ -35,7 +34,7 @@ pipe = DepthCrafterPipeline.from_pretrained(
 pipe.to("cuda")
 
 
-@spaces.GPU()
+@spaces.GPU(duration=120)
 def infer_depth(
     video: str,
     num_denoising_steps: int,
