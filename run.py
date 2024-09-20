@@ -19,7 +19,6 @@ class DepthCrafterDemo:
     ):
         unet = DiffusersUNetSpatioTemporalConditionModelDepthCrafter.from_pretrained(
             unet_path,
-            subfolder="unet",
             low_cpu_mem_usage=True,
             torch_dtype=torch.float16,
         )
