@@ -33,6 +33,7 @@ pipe = DepthCrafterPipeline.from_pretrained(
     variant="fp16",
 )
 pipe.to("cuda")
+pipe.enable_xformers_memory_efficient_attention()
 
 
 @spaces.GPU(duration=120)
