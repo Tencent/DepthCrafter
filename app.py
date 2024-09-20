@@ -35,7 +35,7 @@ pipe = DepthCrafterPipeline.from_pretrained(
 pipe.to("cuda")
 
 
-@spaces.GPU(duration=120)
+@spaces.GPU()
 def infer_depth(
     video: str,
     num_denoising_steps: int,
