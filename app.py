@@ -1,15 +1,5 @@
-import gc
-import os
-from copy import deepcopy
-
+import spaces
 import gradio as gr
-import numpy as np
-import torch
-from diffusers.training_utils import set_seed
-
-from depthcrafter.depth_crafter_ppl import DepthCrafterPipeline
-from depthcrafter.unet import DiffusersUNetSpatioTemporalConditionModelDepthCrafter
-from depthcrafter.utils import read_video_frames, vis_sequence_depth, save_video
 from run import DepthCrafterDemo
 
 examples = [
