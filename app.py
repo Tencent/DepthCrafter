@@ -33,7 +33,6 @@ pipe = DepthCrafterPipeline.from_pretrained(
     variant="fp16",
 )
 pipe.to("cuda")
-pipe.enable_xformers_memory_efficient_attention()
 
 
 @spaces.GPU(duration=120)
@@ -53,6 +52,7 @@ def infer_depth(
     save_npz: bool = False,
 ):
     set_seed(seed)
+    pipe.enable_xformers_memory_efficient_attention()
 
     frames, target_fps = read_video_frames(video, process_length, target_fps, max_res)
     print(f"==> video name: {video}, frames shape: {frames.shape}")
