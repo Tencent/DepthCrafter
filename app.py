@@ -105,7 +105,7 @@ def construct_demo():
                         <a href='https://home.cse.ust.hk/~quan'>Long Quan</a>, \
                         <a href='https://scholar.google.com/citations?user=4oXBp9UAAAAJ&hl=en'>Ying Shan</a>\
                     </h2> \
-                    <a style='font-size:18px;color: #000000'>If you find DepthCrafter useful, please help star the </a>\
+                    <a style='font-size:18px;color: #000000'>If you find DepthCrafter useful, please help ⭐ the </a>\
                     <a style='font-size:18px;color: #FF5DB0' href='https://github.com/wbhu/DepthCrafter'>[Github Repo]</a>\
                     <a style='font-size:18px;color: #000000'>, which is important to Open-Source projects. Thanks!</a>\
                         <a style='font-size:18px;color: #000000' href='https://arxiv.org/abs/2409.02095'> [ArXiv] </a>\
