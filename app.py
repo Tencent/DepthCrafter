@@ -1,3 +1,4 @@
+import gc
 import os
 
 import numpy as np
@@ -16,7 +17,11 @@ from huggingface_hub import hf_hub_download
 from depthcrafter.utils import read_video_frames, vis_sequence_depth, save_video
 
 examples = [
-    ["examples/example_01.mp4", 25, 1.2, 1024, 195],
+    ["examples/example_01.mp4", 10, 1.2, 1024, 60],
+    ["examples/example_02.mp4", 10, 1.2, 1024, 60],
+    ["examples/example_03.mp4", 10, 1.2, 1024, 60],
+    ["examples/example_04.mp4", 10, 1.2, 1024, 60],
+    ["examples/example_05.mp4", 10, 1.2, 1024, 60],
 ]
 
 
@@ -83,6 +88,11 @@ def infer_depth(
     save_video(res, save_path + "_depth.mp4", fps=target_fps)
     save_video(vis, save_path + "_vis.mp4", fps=target_fps)
     save_video(frames, save_path + "_input.mp4", fps=target_fps)
+
+    # clear the cache for the next video
+    gc.collect()
+    torch.cuda.empty_cache()
+
     return [
         save_path + "_input.mp4",
         save_path + "_vis.mp4",
@@ -106,7 +116,7 @@ def construct_demo():
                         <a href='https://scholar.google.com/citations?user=4oXBp9UAAAAJ&hl=en'>Ying Shan</a>\
                     </h2> \
                     <a style='font-size:18px;color: #000000'>If you find DepthCrafter useful, please help ⭐ the </a>\
-                    <a style='font-size:18px;color: #FF5DB0' href='https://github.com/wbhu/DepthCrafter'>[Github Repo]</a>\
+                    <a style='font-size:18px;color: #FF5DB0' href='https://github.com/Tencent/DepthCrafter'>[Github Repo]</a>\
                     <a style='font-size:18px;color: #000000'>, which is important to Open-Source projects. Thanks!</a>\
                         <a style='font-size:18px;color: #000000' href='https://arxiv.org/abs/2409.02095'> [ArXiv] </a>\
                         <a style='font-size:18px;color: #000000' href='https://depthcrafter.github.io/'> [Project Page] </a> </div>
@@ -145,7 +155,7 @@ def construct_demo():
                             label="num denoising steps",
                             minimum=1,
                             maximum=25,
-                            value=25,
+                            value=10,
                             step=1,
                         )
                         guidance_scale = gr.Slider(
@@ -166,7 +176,7 @@ def construct_demo():
                             label="process length",
                             minimum=1,
                             maximum=280,
-                            value=195,
+                            value=60,
                             step=1,
                         )
                     generate_btn = gr.Button("Generate")
@@ -184,7 +194,18 @@ def construct_demo():
             ],
             outputs=[output_video_1, output_video_2],
             fn=infer_depth,
-            cache_examples=False,
+            cache_examples=True,
+        )
+        gr.Markdown(
+            """
+            <span style='font-size:18px;color: #E7CCCC'>Note: 
+            For time quota consideration, we set the default parameters to be more efficient here,
+            with a trade-off of shorter video length and slightly lower quality.
+            You may adjust the parameters according to our 
+            <a style='font-size:18px;color: #FF5DB0' href='https://github.com/Tencent/DepthCrafter'>[Github Repo]</a>
+             for better results if you have enough time quota.
+            </span>
+            """
         )
 
         generate_btn.click(
