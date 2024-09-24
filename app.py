@@ -194,7 +194,7 @@ def construct_demo():
             ],
             outputs=[output_video_1, output_video_2],
             fn=infer_depth,
-            cache_examples=True,
+            cache_examples=False,
         )
         gr.Markdown(
             """
