@@ -9,7 +9,7 @@ app_file: app.py
 pinned: true
 license: other
 thumbnail: >-
-  https://cdn-uploads.huggingface.co/production/uploads/657a7458afbb0117ba15c59f/sMN1x-PpoeftUtvI_tl6d.jpeg
+  https://cdn-uploads.huggingface.co/production/uploads/657a7458afbb0117ba15c59f/n81BOzDvx-nPqGADmNWxD.png
 short_description: a super consistent video depth model
 ---
 
