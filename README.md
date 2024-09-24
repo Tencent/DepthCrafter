@@ -57,6 +57,13 @@ git clone https://github.com/Tencent/DepthCrafter.git
 pip install -r requirements.txt
 ```
 
+## 🤖 Gradio Demo
+- Online demo: [DepthCrafter](https://huggingface.co/spaces/tencent/DepthCrafter) 
+- Local demo:
+```bash
+gradio app.py
+``` 
+
 ## 🤗 Model Zoo
 [DepthCrafter](https://huggingface.co/tencent/DepthCrafter) is available in the Hugging Face Model Hub.
 
@@ -89,11 +96,7 @@ pip install -r requirements.txt
     python run.py  --video-path examples/example_01.mp4  --max-res 512 --num-inference-steps 4 --guidance-scale 1.0
     ```
 
-## 🤖 Gradio Demo
-We provide a local Gradio demo for DepthCrafter, which can be launched by running:
-```bash
-gradio app.py
-``` 
+
 
 ## 🤝 Contributing
 - Welcome to open issues and pull requests.
