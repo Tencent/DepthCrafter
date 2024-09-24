@@ -6,8 +6,11 @@ colorTo: pink
 sdk: gradio
 sdk_version: 4.44.0
 app_file: app.py
-pinned: false
+pinned: true
 license: other
+thumbnail: >-
+  https://cdn-uploads.huggingface.co/production/uploads/657a7458afbb0117ba15c59f/sMN1x-PpoeftUtvI_tl6d.jpeg
+short_description: a super consistent video depth model
 ---
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
