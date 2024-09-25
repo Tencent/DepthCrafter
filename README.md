@@ -26,13 +26,13 @@ arXiv preprint, 2024
 </div>
 
 ## 🔆 Introduction
-
+- [24-9-25] 🤗🤗🤗 Add huggingface online demo [DepthCrafter](https://huggingface.co/spaces/tencent/DepthCrafter). 
 - [24-9-19] Add scripts for preparing benchmark datasets. 
 - [24-9-18] Add point cloud sequence visualization.
 - [24-9-14] 🔥🔥🔥 **DepthCrafter** is released now, have fun!
 
 
-🤗 DepthCrafter can generate temporally consistent long depth sequences with fine-grained details for open-world videos, 
+🤗 DepthCrafter can generate temporally consistent long-depth sequences with fine-grained details for open-world videos, 
 without requiring additional information such as camera poses or optical flow.
 
 ## 🎥 Visualization
