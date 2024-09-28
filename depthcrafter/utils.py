@@ -3,17 +3,29 @@ import cv2
 import matplotlib.cm as cm
 import torch
 
+dataset_res_dict = {
+    "sintel":[448, 1024],
+    "scannet":[640, 832],
+    "kitti":[384, 1280],
+    "bonn":[512, 640],
+    "nyu":[448, 640],
+}
 
-def read_video_frames(video_path, process_length, target_fps, max_res):
+def read_video_frames(video_path, process_length, target_fps, max_res, dataset):
     # a simple function to read video frames
     cap = cv2.VideoCapture(video_path)
     original_fps = cap.get(cv2.CAP_PROP_FPS)
     original_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     original_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     # round the height and width to the nearest multiple of 64
-    height = round(original_height / 64) * 64
-    width = round(original_width / 64) * 64
 
+    if dataset=="open":        
+        height = round(original_height / 64) * 64
+        width = round(original_width / 64) * 64
+    else:
+        height = dataset_res_dict[dataset][0]
+        width = dataset_res_dict[dataset][1]
+    
     # resize the video if the height or width is larger than max_res
     if max(height, width) > max_res:
         scale = max_res / max(original_height, original_width)
