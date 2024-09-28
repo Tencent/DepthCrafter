@@ -26,6 +26,7 @@ arXiv preprint, 2024
 </div>
 
 ## 🔆 Introduction
+- [24-9-28] Add full dataset inference and evaluation scripts for better comparison use. :-)
 - [24-9-25] 🤗🤗🤗 Add huggingface online demo [DepthCrafter](https://huggingface.co/spaces/tencent/DepthCrafter). 
 - [24-9-19] Add scripts for preparing benchmark datasets. 
 - [24-9-18] Add point cloud sequence visualization.
@@ -83,7 +84,7 @@ gradio app.py
     ```
 
 
-#### 2. Low-resolution inference, requires a GPU with ~9GB memory for 512x256 resolution:
+#### 2. Low-resolution inference requires a GPU with ~9GB memory for 512x256 resolution:
 
 - Full inference (~2.3 fps on A100):
 
@@ -96,7 +97,21 @@ gradio app.py
     python run.py  --video-path examples/example_01.mp4  --max-res 512 --num-inference-steps 4 --guidance-scale 1.0
     ```
 
-
+## 🚀 Dataset Evaluation
+Please check the `benchmark` folder. 
+- To create the dataset we use in the paper, you need to run `dataset_extract/dataset_extract_${dataset_name}.py`.
+- Then you will get the `csv` files that save the relative root of extracted RGB video and depth npz files. We also provide these csv files.
+- Inference for all datasets scripts:
+  ```bash
+  bash benchmark/infer/infer.sh
+  ```
+  (Remember to replace the `input_rgb_root` and `saved_root` with your own path.)
+- Evaluation for all datasets scripts:
+  ```bash
+  bash benchmark/eval/eval.sh
+  ```
+   (Remember to replace the `pred_disp_root` and `gt_disp_root` with your own path.)
+####
 
 ## 🤝 Contributing
 - Welcome to open issues and pull requests.
