@@ -1,0 +1,6 @@
+filepath_left,filepath_disparity
+bonn/rgbd_bonn_synchronous_rgb_left.mp4,bonn/rgbd_bonn_synchronous_disparity.npz
+bonn/rgbd_bonn_person_tracking_rgb_left.mp4,bonn/rgbd_bonn_person_tracking_disparity.npz
+bonn/rgbd_bonn_crowd2_rgb_left.mp4,bonn/rgbd_bonn_crowd2_disparity.npz
+bonn/rgbd_bonn_crowd3_rgb_left.mp4,bonn/rgbd_bonn_crowd3_disparity.npz
+bonn/rgbd_bonn_balloon2_rgb_left.mp4,bonn/rgbd_bonn_balloon2_disparity.npz
