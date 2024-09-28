@@ -59,6 +59,7 @@ class DepthCrafterDemo:
         process_length: int = 195,
         overlap: int = 25,
         max_res: int = 1024,
+        dataset: str = "open",
         target_fps: int = 15,
         seed: int = 42,
         track_time: bool = True,
@@ -67,7 +68,7 @@ class DepthCrafterDemo:
         set_seed(seed)
 
         frames, target_fps = read_video_frames(
-            video, process_length, target_fps, max_res
+            video, process_length, target_fps, max_res, dataset,
         )
         print(f"==> video name: {video}, frames shape: {frames.shape}")
 
@@ -177,6 +178,13 @@ if __name__ == "__main__":
     parser.add_argument("--window-size", type=int, default=110, help="Window size")
     parser.add_argument("--overlap", type=int, default=25, help="Overlap size")
     parser.add_argument("--max-res", type=int, default=1024, help="Maximum resolution")
+    parser.add_argument(
+        "--dataset", 
+        type=str, 
+        default="open", 
+        choices=["open", "sintel", "scannet", "kitti", "bonn", 'nyu'], 
+        help="Assigned resolution for specific dataset evaluation"
+    )
     parser.add_argument("--save_npz", type=bool, default=True, help="Save npz file")
     parser.add_argument("--track_time", type=bool, default=False, help="Track time")
 
@@ -199,6 +207,7 @@ if __name__ == "__main__":
             process_length=args.process_length,
             overlap=args.overlap,
             max_res=args.max_res,
+            dataset=args.dataset,
             target_fps=args.target_fps,
             seed=args.seed,
             track_time=args.track_time,
