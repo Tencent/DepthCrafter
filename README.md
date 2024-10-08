@@ -49,6 +49,19 @@ https://github.com/user-attachments/assets/62141cc8-04d0-458f-9558-fe50bc04cc21
 
 ## 🚀 Quick Start
 
+### 🤖 Gradio Demo
+- Online demo: [DepthCrafter](https://huggingface.co/spaces/tencent/DepthCrafter) 
+- Local demo:
+    ```bash
+    gradio app.py
+    ``` 
+
+### 🌟 Community Support
+- [NukeDepthCrafter](https://github.com/Theo-SAMINADIN-td/NukeDepthCrafter): 
+    a plugin allows you to generate temporally consistent Depth sequences inside Nuke, 
+    which is widely used in the VFX industry. 
+
+
 ### 🛠️ Installation
 1. Clone this repo:
 ```bash
@@ -59,14 +72,9 @@ git clone https://github.com/Tencent/DepthCrafter.git
 pip install -r requirements.txt
 ```
 
-## 🤖 Gradio Demo
-- Online demo: [DepthCrafter](https://huggingface.co/spaces/tencent/DepthCrafter) 
-- Local demo:
-```bash
-gradio app.py
-``` 
 
-## 🤗 Model Zoo
+
+### 🤗 Model Zoo
 [DepthCrafter](https://huggingface.co/tencent/DepthCrafter) is available in the Hugging Face Model Hub.
 
 ### 🏃‍♂️ Inference
