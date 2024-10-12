@@ -12,6 +12,7 @@ python benchmark/infer/infer_batch.py \
     --meta_path ./eval/csv/meta_sintel.csv \
     --saved_root ${saved_root} \
     --saved_dataset_folder results_sintel \
+    --input_rgb_root ${input_rgb_root} \
     --process_length 50 \
     --gpus ${gpus} \
     --dataset sintel \
@@ -21,6 +22,7 @@ python benchmark/infer/infer_batch.py \
     --meta_path ./eval/csv/meta_scannet_test.csv \
     --saved_root ${saved_root} \
     --saved_dataset_folder results_scannet \
+    --input_rgb_root ${input_rgb_root} \
     --process_length 90 \
     --gpus ${gpus} \
     --dataset scannet \
@@ -30,6 +32,7 @@ python benchmark/infer/infer_batch.py \
     --meta_path ./eval/csv/meta_kitti_val.csv \
     --saved_root ${saved_root} \
     --saved_dataset_folder results_kitti \
+    --input_rgb_root ${input_rgb_root} \
     --process_length 110 \
     --gpus ${gpus} \
     --dataset kitti \
@@ -49,6 +52,7 @@ python benchmark/infer/infer_batch.py \
     --meta_path ./eval/csv/meta_nyu_test.csv \
     --saved_root ${saved_root} \
     --saved_dataset_folder results_nyu \
+    --input_rgb_root ${input_rgb_root} \
     --process_length 1 \
     --gpus ${gpus} \
     --overlap 0 \
