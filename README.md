@@ -34,8 +34,10 @@ arXiv preprint, 2024
 - [24-9-14] 🔥🔥🔥 **DepthCrafter** is released now, have fun!
 
 
-🤗 DepthCrafter can generate temporally consistent long-depth sequences with fine-grained details for open-world videos, 
+🔥 DepthCrafter can generate temporally consistent long-depth sequences with fine-grained details for open-world videos, 
 without requiring additional information such as camera poses or optical flow.
+
+🤗 If you find DepthCrafter useful, please help ⭐ this repo, which is important to Open-Source projects. Thanks!
 
 ## 🎥 Visualization
 We provide some demos of unprojected point cloud sequences, with reference RGB and estimated depth videos. 
@@ -59,7 +61,8 @@ https://github.com/user-attachments/assets/62141cc8-04d0-458f-9558-fe50bc04cc21
 ### 🌟 Community Support
 - [NukeDepthCrafter](https://github.com/Theo-SAMINADIN-td/NukeDepthCrafter): 
     a plugin allows you to generate temporally consistent Depth sequences inside Nuke, 
-    which is widely used in the VFX industry. 
+    which is widely used in the VFX industry.
+- [ComfyUI-Nodes](https://github.com/akatz-ai/ComfyUI-DepthCrafter-Nodes): creating consistent depth maps for your videos using DepthCrafter in ComfyUI.
 
 
 ### 🛠️ Installation
