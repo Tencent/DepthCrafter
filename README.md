@@ -37,7 +37,7 @@ arXiv preprint, 2024
 🔥 DepthCrafter can generate temporally consistent long-depth sequences with fine-grained details for open-world videos, 
 without requiring additional information such as camera poses or optical flow.
 
-🤗 If you find DepthCrafter useful, please help ⭐ this repo, which is important to Open-Source projects. Thanks!
+🤗 If you find DepthCrafter useful, **please help ⭐ this repo**, which is important to Open-Source projects. Thanks!
 
 ## 🎥 Visualization
 We provide some demos of unprojected point cloud sequences, with reference RGB and estimated depth videos. 
