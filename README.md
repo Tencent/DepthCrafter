@@ -28,7 +28,7 @@ arXiv preprint, 2024
 
 ## 🔆 Introduction
 
-- `[24-10-19]` 🤗🤗🤗 DepthCrafter now has been integrated into [ComfyUI]([https://github.com/Theo-SAMINADIN-td/NukeDepthCrafter](https://github.com/akatz-ai/ComfyUI-DepthCrafter-Nodes))!
+- `[24-10-19]` 🤗🤗🤗 DepthCrafter now has been integrated into [ComfyUI](https://github.com/akatz-ai/ComfyUI-DepthCrafter-Nodes)!
 - `[24-10-08]` 🤗🤗🤗 DepthCrafter now has been integrated into [Nuke](https://github.com/Theo-SAMINADIN-td/NukeDepthCrafter), have a try!
 - `[24-09-28]` Add full dataset inference and evaluation scripts for better comparison use. :-)
 - `[24-09-25]` 🤗🤗🤗 Add huggingface online demo [DepthCrafter](https://huggingface.co/spaces/tencent/DepthCrafter). 
