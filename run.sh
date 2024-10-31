@@ -21,4 +21,4 @@ docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
    -v "$CACHE_DIR":/root/.cache/huggingface \
    -v $(pwd)/output:/workspace/DepthCrafter/output \
    -v $(pwd)/input:/workspace/DepthCrafter/input \
-   -it --rm "$IMAGE_NAME" "input/$@"
+   -it --rm "$IMAGE_NAME" input/$@
