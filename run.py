@@ -156,7 +156,7 @@ if __name__ == "__main__":
         help="Path to the pre-trained model",
     )
     parser.add_argument(
-        "--process-length", type=int, default=-1, help="Number of frames to process"
+        "--process-length", type=int, default=195, help="Number of frames to process"
     )
     parser.add_argument(
         "--cpu-offload",
