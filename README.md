@@ -26,6 +26,26 @@ arXiv preprint, 2024
 
 </div>
 
+## Run in Docker
+```bash
+git clone https://github.com/everest-8849/DepthCrafter.git
+cd DepthCrafter
+sudo docker build -t depthcrafter .
+```
+
+- Single run, copy your video files to `./input` folder:
+  ```bash
+  sudo sh run.sh videp.mp4
+  ```
+
+- Batch run, copy your video files to `./batch` folder:
+  ```bash
+  sudo sh run_batch.sh
+  ```
+
+Files are output in the `./output` folder  
+
+
 ## 🔆 Introduction
 
 - `[24-10-19]` 🤗🤗🤗 DepthCrafter now has been integrated into [ComfyUI](https://github.com/akatz-ai/ComfyUI-DepthCrafter-Nodes)!
