@@ -33,4 +33,4 @@ docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
    -v "$CACHE_DIR":/root/.cache/huggingface \
    -v $(pwd)/output:/workspace/DepthCrafter/output \
    -v "$BATCH_DIR":/workspace/DepthCrafter/input \
-   -it --rm "$IMAGE_NAME" --video-path "$VIDEO_PATHS"
+   -it --rm "$IMAGE_NAME" "$VIDEO_PATHS"
