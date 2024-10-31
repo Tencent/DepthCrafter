@@ -19,5 +19,6 @@ fi
 # Run the Docker container with GPU support and bind mounts for Hugging Face cache and video directory
 docker run --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
    -v "$CACHE_DIR":/root/.cache/huggingface \
-   -v $(pwd):/workspace/DepthCrafter/output \
+   -v $(pwd)/output:/workspace/DepthCrafter/output \
+   -v $(pwd):/workspace/DepthCrafter/input \
    -it --rm "$IMAGE_NAME" "$@"
