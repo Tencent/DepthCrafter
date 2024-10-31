@@ -20,7 +20,7 @@ if [ ! -d "$CACHE_DIR" ]; then
 fi
 
 # Collect all video file paths in the batch directory, prefix with "input/", and create a comma-separated list
-VIDEO_PATHS=$(ls "$BATCH_DIR"/* 2>/dev/null | sed 's|^|input/|' | tr '\n' ',' | sed 's/,$//')
+VIDEO_PATHS=$(find "$BATCH_DIR" -type f ! -name ".gitignore" -exec basename {} \; | sed 's|^|input/|' | tr '\n' ',' | sed 's/,$//')
 
 # Check if any video files are found
 if [ -z "$VIDEO_PATHS" ]; then
