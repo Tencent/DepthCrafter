@@ -54,7 +54,7 @@ class DepthCrafterDemo:
         video: str,
         num_denoising_steps: int,
         guidance_scale: float,
-        save_folder: str = "./demo_output",
+        save_folder: str = "./output",
         window_size: int = 110,
         process_length: int = 195,
         overlap: int = 25,
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--save-folder",
         type=str,
-        default="./demo_output",
+        default="./output",
         help="Folder to save the output",
     )
     parser.add_argument(
@@ -156,7 +156,7 @@ if __name__ == "__main__":
         help="Path to the pre-trained model",
     )
     parser.add_argument(
-        "--process-length", type=int, default=195, help="Number of frames to process"
+        "--process-length", type=int, default=-1, help="Number of frames to process"
     )
     parser.add_argument(
         "--cpu-offload",
@@ -166,7 +166,7 @@ if __name__ == "__main__":
         help="CPU offload option",
     )
     parser.add_argument(
-        "--target-fps", type=int, default=15, help="Target FPS for the output video"
+        "--target-fps", type=int, default=-1, help="Target FPS for the output video"
     )  # -1 for original fps
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument(
