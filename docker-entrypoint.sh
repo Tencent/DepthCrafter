@@ -4,4 +4,4 @@
 source /opt/venv/bin/activate
 
 # Run the Python script with the passed video path(s)
-python run.py --video-path "$@"
+python run.py --video-path "input/$@"
