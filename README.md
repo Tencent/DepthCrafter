@@ -35,7 +35,7 @@ sudo docker build -t depthcrafter .
 
 - Single run, copy your video files to `./input` folder:
   ```bash
-  sudo sh run.sh videp.mp4
+  sudo sh run.sh video.mp4
   ```
 
 - Batch run, copy your video files to `./batch` folder:
