@@ -43,7 +43,7 @@ without requiring additional information such as camera poses or optical flow.
 🤗 If you find DepthCrafter useful, **please help ⭐ this repo**, which is important to Open-Source projects. Thanks!
 
 ## 🎥 Visualization
-We provide some demos of unprojected point cloud sequences, with reference RGB and estimated depth videos. 
+We provide demos of unprojected point cloud sequences, with reference RGB and estimated depth videos. 
 Please refer to our [project page](https://depthcrafter.github.io) for more details.
 
 
