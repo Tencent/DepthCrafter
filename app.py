@@ -17,11 +17,11 @@ from huggingface_hub import hf_hub_download
 from depthcrafter.utils import read_video_frames, vis_sequence_depth, save_video
 
 examples = [
-    ["examples/example_01.mp4", 10, 1.2, 1024, 60],
-    ["examples/example_02.mp4", 10, 1.2, 1024, 60],
-    ["examples/example_03.mp4", 10, 1.2, 1024, 60],
-    ["examples/example_04.mp4", 10, 1.2, 1024, 60],
-    ["examples/example_05.mp4", 10, 1.2, 1024, 60],
+    ["examples/example_01.mp4", 5, 1.0, 1024, -1, -1],
+    ["examples/example_02.mp4", 5, 1.0, 1024, -1, -1],
+    ["examples/example_03.mp4", 5, 1.0, 1024, -1, -1],
+    ["examples/example_04.mp4", 5, 1.0, 1024, -1, -1],
+    ["examples/example_05.mp4", 5, 1.0, 1024, -1, -1],
 ]
 
 
@@ -39,18 +39,18 @@ pipe = DepthCrafterPipeline.from_pretrained(
 pipe.to("cuda")
 
 
-@spaces.GPU(duration=140)
+@spaces.GPU(duration=120)
 def infer_depth(
     video: str,
     num_denoising_steps: int,
     guidance_scale: float,
     max_res: int = 1024,
-    process_length: int = 195,
+    process_length: int = -1,
+    target_fps: int = -1,
     #
     save_folder: str = "./demo_output",
     window_size: int = 110,
     overlap: int = 25,
-    target_fps: int = 15,
     seed: int = 42,
     track_time: bool = True,
     save_npz: bool = False,
@@ -59,7 +59,6 @@ def infer_depth(
     pipe.enable_xformers_memory_efficient_attention()
 
     frames, target_fps = read_video_frames(video, process_length, target_fps, max_res)
-    print(f"==> video name: {video}, frames shape: {frames.shape}")
 
     # inference the depth map using the DepthCrafter pipeline
     with torch.inference_mode():
@@ -82,6 +81,7 @@ def infer_depth(
     vis = vis_sequence_depth(res)
     # save the depth map and visualization with the target FPS
     save_path = os.path.join(save_folder, os.path.splitext(os.path.basename(video))[0])
+    print(f"==> saving results to {save_path}")
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     if save_npz:
         np.savez_compressed(save_path + ".npz", depth=res)
@@ -155,14 +155,14 @@ def construct_demo():
                             label="num denoising steps",
                             minimum=1,
                             maximum=25,
-                            value=10,
+                            value=5,
                             step=1,
                         )
                         guidance_scale = gr.Slider(
                             label="cfg scale",
                             minimum=1.0,
                             maximum=1.2,
-                            value=1.2,
+                            value=1.0,
                             step=0.1,
                         )
                         max_res = gr.Slider(
@@ -174,9 +174,16 @@ def construct_demo():
                         )
                         process_length = gr.Slider(
                             label="process length",
-                            minimum=1,
+                            minimum=-1,
                             maximum=280,
                             value=60,
+                            step=1,
+                        )
+                        process_target_fps = gr.Slider(
+                            label="target FPS",
+                            minimum=-1,
+                            maximum=30,
+                            value=15,
                             step=1,
                         )
                     generate_btn = gr.Button("Generate")
@@ -191,6 +198,7 @@ def construct_demo():
                 guidance_scale,
                 max_res,
                 process_length,
+                process_target_fps,
             ],
             outputs=[output_video_1, output_video_2],
             fn=infer_depth,
@@ -216,6 +224,7 @@ def construct_demo():
                 guidance_scale,
                 max_res,
                 process_length,
+                process_target_fps,
             ],
             outputs=[output_video_1, output_video_2],
         )
@@ -223,9 +232,8 @@ def construct_demo():
     return depthcrafter_iface
 
 
-demo = construct_demo()
-
 if __name__ == "__main__":
+    demo = construct_demo()
     demo.queue()
-    # demo.launch(server_name="0.0.0.0", server_port=80, debug=True)
+    # demo.launch(server_name="0.0.0.0", server_port=12345, debug=True, share=False)
     demo.launch(share=True)

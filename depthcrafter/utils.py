@@ -5,6 +5,50 @@ import PIL.Image
 import matplotlib.cm as cm
 import mediapy
 import torch
+from decord import VideoReader, cpu
+
+dataset_res_dict = {
+    "sintel": [448, 1024],
+    "scannet": [640, 832],
+    "KITTI": [384, 1280],
+    "bonn": [512, 640],
+    "NYUv2": [448, 640],
+}
+
+
+def read_video_frames(video_path, process_length, target_fps, max_res, dataset="open"):
+    if dataset == "open":
+        print("==> processing video: ", video_path)
+        vid = VideoReader(video_path, ctx=cpu(0))
+        print("==> original video shape: ", (len(vid), *vid.get_batch([0]).shape[1:]))
+        original_height, original_width = vid.get_batch([0]).shape[1:3]
+        height = round(original_height / 64) * 64
+        width = round(original_width / 64) * 64
+        if max(height, width) > max_res:
+            scale = max_res / max(original_height, original_width)
+            height = round(original_height * scale / 64) * 64
+            width = round(original_width * scale / 64) * 64
+    else:
+        height = dataset_res_dict[dataset][0]
+        width = dataset_res_dict[dataset][1]
+
+    vid = VideoReader(video_path, ctx=cpu(0), width=width, height=height)
+
+    fps = vid.get_avg_fps() if target_fps == -1 else target_fps
+    stride = round(vid.get_avg_fps() / fps)
+    stride = max(stride, 1)
+    frames_idx = list(range(0, len(vid), stride))
+    print(
+        f"==> downsampled shape: {len(frames_idx), *vid.get_batch([0]).shape[1:]}, with stride: {stride}"
+    )
+    if process_length != -1 and process_length < len(frames_idx):
+        frames_idx = frames_idx[:process_length]
+    print(
+        f"==> final processing shape: {len(frames_idx), *vid.get_batch([0]).shape[1:]}"
+    )
+    frames = vid.get_batch(frames_idx).asnumpy().astype("float32") / 255.0
+
+    return frames, fps
 
 
 def save_video(
