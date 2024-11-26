@@ -4,6 +4,7 @@
 
 
 
+![Version](https://img.shields.io/badge/version-1.0.1-blue) &nbsp;
  <a href='https://arxiv.org/abs/2409.02095'><img src='https://img.shields.io/badge/arXiv-2409.02095-b31b1b.svg'></a> &nbsp;
  <a href='https://depthcrafter.github.io'><img src='https://img.shields.io/badge/Project-Page-Green'></a> &nbsp;
  <a href='https://huggingface.co/spaces/tencent/DepthCrafter'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Demo-blue'></a> &nbsp;
@@ -194,9 +195,19 @@ Please check the `benchmark` folder.
    (Remember to replace the `pred_disp_root` and `gt_disp_root` with your own path.)
 ####
 
-## 🤝 Contributing
+## 🤝🍻 Contributing
 - Welcome to open issues and pull requests.
 - Welcome to optimize the inference speed and memory usage, e.g., through model quantization, distillation, or other acceleration techniques.
+
+    ### Contributors
+    <a href="https://github.com/Tencent/DepthCrafter/graphs/contributors">
+      <img src="https://contrib.rocks/image?repo=Tencent/DepthCrafter" />
+    </a>
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Tencent/DepthCrafter&type=Date)](https://star-history.com/#Tencent/DepthCrafter&Date)
+
 
 ## 📜 Citation
 If you find this work helpful, please consider citing:
