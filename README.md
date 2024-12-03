@@ -125,7 +125,7 @@ without requiring additional information such as camera poses or optical flow.
 
 ## 🎥 Visualization
 We provide demos of unprojected point cloud sequences, with reference RGB and estimated depth videos. 
-Please refer to our [project page](https://depthcrafter.github.io) for more details.
+For more details, please refer to our [project page](https://depthcrafter.github.io).
 
 
 https://github.com/user-attachments/assets/62141cc8-04d0-458f-9558-fe50bc04cc21
@@ -187,12 +187,12 @@ Please check the `benchmark` folder.
   ```bash
   bash benchmark/infer/infer.sh
   ```
-  (Remember to replace the `input_rgb_root` and `saved_root` with your own path.)
+  (Remember to replace the `input_rgb_root` and `saved_root` with your path.)
 - Evaluation for all datasets scripts:
   ```bash
   bash benchmark/eval/eval.sh
   ```
-   (Remember to replace the `pred_disp_root` and `gt_disp_root` with your own path.)
+   (Remember to replace the `pred_disp_root` and `gt_disp_root` with your wpath.)
 ####
 
 ## 🤝🍻 Contributing
@@ -211,7 +211,7 @@ Please check the `benchmark` folder.
 
 ## 📜 Citation
 If you find this work helpful, please consider citing:
-```bibtex
+```BibTeXw
 @article{hu2024-DepthCrafter,
             author      = {Hu, Wenbo and Gao, Xiangjun and Li, Xiaoyu and Zhao, Sijie and Cun, Xiaodong and Zhang, Yong and Quan, Long and Shan, Ying},
             title       = {DepthCrafter: Generating Consistent Long Depth Sequences for Open-world Videos},
