@@ -24,6 +24,6 @@ def npz_to_multiframe_exr(input_npz, output_folder):
 
 # Specify the input .npz file and output folder
 npz_to_multiframe_exr(
-    r"C:\Users\Tobia\OneDrive\Documents\GitHub\DepthCrafter\demo_output\01_doggie_spatial_cwu_rightwew.npz", 
-    r"C:\Users\Tobia\OneDrive\Documents\GitHub\DepthCrafter\demo_output\frames"
+    r"path_to_input", 
+    r"path_to_output"
 )
