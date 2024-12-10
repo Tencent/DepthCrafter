@@ -33,6 +33,7 @@ arXiv preprint, 2024
 🔥 DepthCrafter can generate temporally consistent long-depth sequences with fine-grained details for open-world videos, 
 without requiring additional information such as camera poses or optical flow.
 
+- `[24-12-10]` 🌟🌟🌟 EXR output format is supported now, with --save_exr option.
 - `[24-11-26]` 🚀🚀🚀 DepthCrafter v1.0.1 is released now, with improved quality and speed
 - `[24-10-19]` 🤗🤗🤗 DepthCrafter now has been integrated into [ComfyUI](https://github.com/akatz-ai/ComfyUI-DepthCrafter-Nodes)!
 - `[24-10-08]` 🤗🤗🤗 DepthCrafter now has been integrated into [Nuke](https://github.com/Theo-SAMINADIN-td/NukeDepthCrafter), have a try!

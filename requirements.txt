@@ -8,3 +8,4 @@ xformers==0.0.20
 mediapy==1.2.0
 fire==0.6.0
 decord==0.6.0
+OpenEXR==3.2.4

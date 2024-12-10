@@ -65,6 +65,7 @@ class DepthCrafterDemo:
         seed: int = 42,
         track_time: bool = True,
         save_npz: bool = False,
+        save_exr: bool = False,
     ):
         set_seed(seed)
 
@@ -99,11 +100,32 @@ class DepthCrafterDemo:
             save_folder, os.path.splitext(os.path.basename(video))[0]
         )
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
-        if save_npz:
-            np.savez_compressed(save_path + ".npz", depth=res)
         save_video(res, save_path + "_depth.mp4", fps=target_fps)
         save_video(vis, save_path + "_vis.mp4", fps=target_fps)
         save_video(frames, save_path + "_input.mp4", fps=target_fps)
+        if save_npz:
+            np.savez_compressed(save_path + ".npz", depth=res)
+        if save_exr:
+            import OpenEXR
+            import Imath
+
+            os.makedirs(save_path, exist_ok=True)
+            print(f"==> saving EXR results to {save_path}")
+            # Iterate over each frame and save as a separate EXR file
+            for i, frame in enumerate(res):
+                output_exr = f"{save_path}/frame_{i:04d}.exr"
+
+                # Prepare EXR header for each frame
+                header = OpenEXR.Header(frame.shape[1], frame.shape[0])
+                header["channels"] = {
+                    "Z": Imath.Channel(Imath.PixelType(Imath.PixelType.FLOAT))
+                }
+
+                # Create EXR file and write the frame
+                exr_file = OpenEXR.OutputFile(output_exr, header)
+                exr_file.writePixels({"Z": frame.tobytes()})
+                exr_file.close()
+
         return [
             save_path + "_input.mp4",
             save_path + "_vis.mp4",
@@ -146,7 +168,8 @@ def main(
     overlap: int = 25,
     max_res: int = 1024,
     dataset: str = "open",
-    save_npz: bool = True,
+    save_npz: bool = False,
+    save_exr: bool = False,
     track_time: bool = False,
 ):
     depthcrafter_demo = DepthCrafterDemo(
@@ -171,6 +194,7 @@ def main(
             seed=seed,
             track_time=track_time,
             save_npz=save_npz,
+            save_exr=save_exr,
         )
         # clear the cache for the next video
         gc.collect()
