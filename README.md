@@ -27,6 +27,16 @@ arXiv preprint, 2024
 
 </div>
 
+## 🔆 Notice
+
+**DepthCrafter is still under active development!**
+
+We recommend that everyone use English to communicate on issues, as this helps developers from around the world discuss, share experiences, and answer questions together.
+
+For business licensing and other related inquiries, don't hesitate to contact `wbhu@tencent.com`.
+
+
+
 ## 🔆 Introduction
 🤗 If you find DepthCrafter useful, **please help ⭐ this repo**, which is important to Open-Source projects. Thanks!
 
