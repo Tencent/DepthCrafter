@@ -23,7 +23,7 @@ _**[Wenbo Hu<sup>1* &dagger;</sup>](https://wbhu.github.io),
 <sup>2</sup>The Hong Kong University of Science and Technology
 <sup>3</sup>ARC Lab, Tencent PCG
 
-CVPR, 2025
+CVPR 2025， **Highlight**
 
 </div>
 
