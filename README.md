@@ -43,6 +43,7 @@ For business licensing and other related inquiries, don't hesitate to contact `w
 🔥 DepthCrafter can generate temporally consistent long-depth sequences with fine-grained details for open-world videos, 
 without requiring additional information such as camera poses or optical flow.
 
+- `[25-04-05]` 🔥🔥🔥 Its upgraded work, [GeometryCrafter](https://github.com/TencentARC/GeometryCrafter), is released now, for **video to point cloud**!
 - `[25-04-05]` 🎉🎉🎉 DepthCrafter is selected as **Highlight** in CVPR‘25.
 - `[24-12-10]` 🌟🌟🌟 EXR output format is supported now, with --save_exr option.
 - `[24-11-26]` 🚀🚀🚀 DepthCrafter v1.0.1 is released now, with improved quality and speed
@@ -224,10 +225,10 @@ Please check the `benchmark` folder.
 ## 📜 Citation
 If you find this work helpful, please consider citing:
 ```BibTeXw
-@article{hu2024-DepthCrafter,
+@inproceedings{hu2025-DepthCrafter,
             author      = {Hu, Wenbo and Gao, Xiangjun and Li, Xiaoyu and Zhao, Sijie and Cun, Xiaodong and Zhang, Yong and Quan, Long and Shan, Ying},
             title       = {DepthCrafter: Generating Consistent Long Depth Sequences for Open-world Videos},
-            journal     = {arXiv preprint arXiv:2409.02095},
-            year        = {2024}
+            booktitle   = {CVPR},
+            year        = {2025}
     }
 ```
