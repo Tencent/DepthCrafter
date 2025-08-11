@@ -39,7 +39,7 @@ class DiffusersUNetSpatioTemporalConditionModelDepthCrafter(
         t_emb = self.time_proj(timesteps)
 
         # `Timesteps` does not contain any weights and will always return f32 tensors
-        # but time_embedding might actually be running in fp16. so we need to cast here.
+        # time_embedding should be running in fp32. Cast to ensure compatibility.
         # there might be better ways to encapsulate this.
         t_emb = t_emb.to(dtype=self.conv_in.weight.dtype)
 
