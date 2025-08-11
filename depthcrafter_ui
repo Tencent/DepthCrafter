@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+"""
+DepthCrafter UI Launcher
+Quick launcher for the interactive CLI
+"""
+
+import sys
+import os
+
+# Add current directory to path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# Import and run the interactive CLI
+from interactive_cli import main
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n\nExiting...")
+        sys.exit(0)

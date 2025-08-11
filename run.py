@@ -21,18 +21,26 @@ class DepthCrafterDemo:
         unet = DiffusersUNetSpatioTemporalConditionModelDepthCrafter.from_pretrained(
             unet_path,
             low_cpu_mem_usage=True,
-            torch_dtype=torch.float16,
+            torch_dtype=torch.float32,
         )
         # load weights of other components from the provided checkpoint
         self.pipe = DepthCrafterPipeline.from_pretrained(
             pre_train_path,
             unet=unet,
-            torch_dtype=torch.float16,
-            variant="fp16",
+            torch_dtype=torch.float32,
         )
 
-        # for saving memory, we can offload the model to CPU, or even run the model sequentially to save more memory
-        if cpu_offload is not None:
+        # Determine the target device
+        # Note: MPS doesn't support Conv3D operations required by this model
+        # So we use CPU for Apple Silicon devices
+        if torch.cuda.is_available():
+            device = "cuda"
+        else:
+            device = "cpu"
+        
+        # Handle model placement and offloading
+        if cpu_offload is not None and torch.cuda.is_available():
+            # CPU offloading only works with CUDA
             if cpu_offload == "sequential":
                 # This will slow, but save more memory
                 self.pipe.enable_sequential_cpu_offload()
@@ -41,13 +49,14 @@ class DepthCrafterDemo:
             else:
                 raise ValueError(f"Unknown cpu offload option: {cpu_offload}")
         else:
-            self.pipe.to("cuda")
-        # enable attention slicing and xformers memory efficient attention
-        try:
-            self.pipe.enable_xformers_memory_efficient_attention()
-        except Exception as e:
-            print(e)
-            print("Xformers is not enabled")
+            # For MPS or CPU, just move the entire model to the device
+            self.pipe.to(device)
+        # enable attention slicing and xformers memory efficient attention (only for CUDA)
+        if torch.cuda.is_available():
+            try:
+                self.pipe.enable_xformers_memory_efficient_attention()
+            except Exception as e:
+                print(f"Xformers not enabled: {e}")
         self.pipe.enable_attention_slicing()
 
     def infer(
@@ -66,15 +75,21 @@ class DepthCrafterDemo:
         track_time: bool = True,
         save_npz: bool = False,
         save_exr: bool = False,
+        max_frames: int = -1,
+        start_frame: int = 0,
     ):
         set_seed(seed)
 
+        # Use max_frames if specified, otherwise use process_length
+        frame_limit = max_frames if max_frames > 0 else process_length
+        
         frames, target_fps = read_video_frames(
             video,
-            process_length,
+            frame_limit,
             target_fps,
             max_res,
             dataset,
+            start_frame=start_frame,
         )
         # inference the depth map using the DepthCrafter pipeline
         with torch.inference_mode():
@@ -149,7 +164,8 @@ class DepthCrafterDemo:
         )
         # clear the cache for the next video
         gc.collect()
-        torch.cuda.empty_cache()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         return res_path[:2]
 
 
@@ -159,7 +175,7 @@ def main(
     unet_path: str = "tencent/DepthCrafter",
     pre_train_path: str = "stabilityai/stable-video-diffusion-img2vid-xt",
     process_length: int = -1,
-    cpu_offload: str = "model",
+    cpu_offload: str = None,
     target_fps: int = -1,
     seed: int = 42,
     num_inference_steps: int = 5,
@@ -171,6 +187,8 @@ def main(
     save_npz: bool = False,
     save_exr: bool = False,
     track_time: bool = False,
+    max_frames: int = -1,
+    start_frame: int = 0,
 ):
     depthcrafter_demo = DepthCrafterDemo(
         unet_path=unet_path,
@@ -195,10 +213,13 @@ def main(
             track_time=track_time,
             save_npz=save_npz,
             save_exr=save_exr,
+            max_frames=max_frames,
+            start_frame=start_frame,
         )
         # clear the cache for the next video
         gc.collect()
-        torch.cuda.empty_cache()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
 
 if __name__ == "__main__":
@@ -206,4 +227,6 @@ if __name__ == "__main__":
     # the most important arguments for memory saving are `cpu_offload`, `enable_xformers`, `max_res`, and `window_size`
     # the most important arguments for trade-off between quality and speed are
     # `num_inference_steps`, `guidance_scale`, and `max_res`
+    # Use `max_frames` to limit the number of frames to process (e.g., --max-frames 50)
+    # Use `start_frame` to start from a specific frame (e.g., --start-frame 100)
     Fire(main)

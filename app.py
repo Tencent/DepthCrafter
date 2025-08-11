@@ -25,18 +25,20 @@ examples = [
 ]
 
 
+# Detect device - use CPU since MPS doesn't support Conv3D
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
 unet = DiffusersUNetSpatioTemporalConditionModelDepthCrafter.from_pretrained(
     "tencent/DepthCrafter",
     low_cpu_mem_usage=True,
-    torch_dtype=torch.float16,
+    torch_dtype=torch.float32,
 )
 pipe = DepthCrafterPipeline.from_pretrained(
     "stabilityai/stable-video-diffusion-img2vid-xt",
     unet=unet,
-    torch_dtype=torch.float16,
-    variant="fp16",
+    torch_dtype=torch.float32,
 )
-pipe.to("cuda")
+pipe.to(device)
 
 
 @spaces.GPU(duration=120)
@@ -56,7 +58,12 @@ def infer_depth(
     save_npz: bool = False,
 ):
     set_seed(seed)
-    pipe.enable_xformers_memory_efficient_attention()
+    # Only enable xformers for CUDA devices
+    if torch.cuda.is_available():
+        try:
+            pipe.enable_xformers_memory_efficient_attention()
+        except Exception as e:
+            print(f"Xformers not enabled: {e}")
 
     frames, target_fps = read_video_frames(video, process_length, target_fps, max_res)
 
@@ -91,7 +98,8 @@ def infer_depth(
 
     # clear the cache for the next video
     gc.collect()
-    torch.cuda.empty_cache()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
 
     return [
         save_path + "_input.mp4",

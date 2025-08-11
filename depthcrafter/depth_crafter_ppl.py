@@ -15,7 +15,46 @@ from diffusers.utils.torch_utils import randn_tensor
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 
 
+def _resize_with_antialiasing_safe(input, size, interpolation="bicubic", align_corners=True):
+    """Wrapper for resize that uses the standard function."""
+    # Since we're not using MPS anymore, we can use the original function
+    return _resize_with_antialiasing(input, size)
+
+
 class DepthCrafterPipeline(StableVideoDiffusionPipeline):
+    
+    @property
+    def _execution_device(self):
+        """
+        Returns the device on which the pipeline should be executed.
+        Note: MPS is not used due to lack of Conv3D support.
+        """
+        # If device attribute exists and is set
+        if hasattr(self, 'device') and self.device is not None:
+            if self.device != torch.device("meta"):
+                return self.device
+        
+        # Check if model has hooks (for CPU offloading)
+        if hasattr(self.unet, "_hf_hook"):
+            for module in self.unet.modules():
+                if (
+                    hasattr(module, "_hf_hook")
+                    and hasattr(module._hf_hook, "execution_device")
+                    and module._hf_hook.execution_device is not None
+                ):
+                    return torch.device(module._hf_hook.execution_device)
+        
+        # Try to get device from model parameters
+        try:
+            return next(self.unet.parameters()).device
+        except:
+            pass
+            
+        # Default fallback based on availability
+        # MPS doesn't support Conv3D, so we use CPU for Apple Silicon
+        if torch.cuda.is_available():
+            return torch.device("cuda")
+        return torch.device("cpu")
 
     @torch.inference_mode()
     def encode_video(
@@ -29,7 +68,7 @@ class DepthCrafterPipeline(StableVideoDiffusionPipeline):
         :return: image_embeddings in shape of [b, 1024]
         """
 
-        video_224 = _resize_with_antialiasing(video.float(), (224, 224))
+        video_224 = _resize_with_antialiasing_safe(video.float(), (224, 224))
         video_224 = (video_224 + 1.0) / 2.0  # [-1, 1] -> [0, 1]
 
         embeddings = []
@@ -153,18 +192,18 @@ class DepthCrafterPipeline(StableVideoDiffusionPipeline):
         video = video * 2.0 - 1.0  # [0,1] -> [-1,1], in [t, c, h, w]
 
         if track_time:
-            start_event = torch.cuda.Event(enable_timing=True)
-            encode_event = torch.cuda.Event(enable_timing=True)
-            denoise_event = torch.cuda.Event(enable_timing=True)
-            decode_event = torch.cuda.Event(enable_timing=True)
-            start_event.record()
+            import time
+            start_time = time.time()
+            encode_time = None
+            denoise_time = None
 
         video_embeddings = self.encode_video(
             video, chunk_size=decode_chunk_size
         ).unsqueeze(
             0
         )  # [1, t, 1024]
-        torch.cuda.empty_cache()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         # 4. Encode input image using VAE
         noise = randn_tensor(
             video.shape, generator=generator, device=device, dtype=video.dtype
@@ -173,7 +212,7 @@ class DepthCrafterPipeline(StableVideoDiffusionPipeline):
 
         # pdb.set_trace()
         needs_upcasting = (
-            self.vae.dtype == torch.float16 and self.vae.config.force_upcast
+            self.vae.dtype == torch.float32 and self.vae.config.force_upcast
         )
         if needs_upcasting:
             self.vae.to(dtype=torch.float32)
@@ -186,16 +225,16 @@ class DepthCrafterPipeline(StableVideoDiffusionPipeline):
         )  # [1, t, c, h, w]
 
         if track_time:
-            encode_event.record()
-            torch.cuda.synchronize()
-            elapsed_time_ms = start_event.elapsed_time(encode_event)
-            print(f"Elapsed time for encoding video: {elapsed_time_ms} ms")
+            encode_time = time.time()
+            elapsed_time_ms = (encode_time - start_time) * 1000
+            print(f"Elapsed time for encoding video: {elapsed_time_ms:.2f} ms")
 
-        torch.cuda.empty_cache()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
-        # cast back to fp16 if needed
+        # cast back to fp32 if needed
         if needs_upcasting:
-            self.vae.to(dtype=torch.float16)
+            self.vae.to(dtype=torch.float32)
 
         # 5. Get Added Time IDs
         added_time_ids = self._get_add_time_ids(
@@ -238,7 +277,8 @@ class DepthCrafterPipeline(StableVideoDiffusionPipeline):
         else:
             weights = None
 
-        torch.cuda.empty_cache()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
         # inference strategy for long videos
         # two main strategies: 1. noise init from previous frame, 2. segments stitching
@@ -335,22 +375,20 @@ class DepthCrafterPipeline(StableVideoDiffusionPipeline):
             idx_start += stride
 
         if track_time:
-            denoise_event.record()
-            torch.cuda.synchronize()
-            elapsed_time_ms = encode_event.elapsed_time(denoise_event)
-            print(f"Elapsed time for denoising video: {elapsed_time_ms} ms")
+            denoise_time = time.time()
+            elapsed_time_ms = (denoise_time - encode_time) * 1000
+            print(f"Elapsed time for denoising video: {elapsed_time_ms:.2f} ms")
 
         if not output_type == "latent":
-            # cast back to fp16 if needed
+            # cast back to fp32 if needed
             if needs_upcasting:
-                self.vae.to(dtype=torch.float16)
+                self.vae.to(dtype=torch.float32)
             frames = self.decode_latents(latents_all, num_frames, decode_chunk_size)
 
             if track_time:
-                decode_event.record()
-                torch.cuda.synchronize()
-                elapsed_time_ms = denoise_event.elapsed_time(decode_event)
-                print(f"Elapsed time for decoding video: {elapsed_time_ms} ms")
+                decode_time = time.time()
+                elapsed_time_ms = (decode_time - denoise_time) * 1000
+                print(f"Elapsed time for decoding video: {elapsed_time_ms:.2f} ms")
 
             frames = self.video_processor.postprocess_video(
                 video=frames, output_type=output_type
