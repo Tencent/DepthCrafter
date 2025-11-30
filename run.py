@@ -1,156 +1,9 @@
-import gc
-import os
-import numpy as np
-import torch
-
-from diffusers.training_utils import set_seed
+import logging
 from fire import Fire
 
-from depthcrafter.depth_crafter_ppl import DepthCrafterPipeline
-from depthcrafter.unet import DiffusersUNetSpatioTemporalConditionModelDepthCrafter
-from depthcrafter.utils import vis_sequence_depth, save_video, read_video_frames
+from depthcrafter.inference import DepthCrafterInference
 
-
-class DepthCrafterDemo:
-    def __init__(
-        self,
-        unet_path: str,
-        pre_train_path: str,
-        cpu_offload: str = "model",
-    ):
-        unet = DiffusersUNetSpatioTemporalConditionModelDepthCrafter.from_pretrained(
-            unet_path,
-            low_cpu_mem_usage=True,
-            torch_dtype=torch.float16,
-        )
-        # load weights of other components from the provided checkpoint
-        self.pipe = DepthCrafterPipeline.from_pretrained(
-            pre_train_path,
-            unet=unet,
-            torch_dtype=torch.float16,
-            variant="fp16",
-        )
-
-        # for saving memory, we can offload the model to CPU, or even run the model sequentially to save more memory
-        if cpu_offload is not None:
-            if cpu_offload == "sequential":
-                # This will slow, but save more memory
-                self.pipe.enable_sequential_cpu_offload()
-            elif cpu_offload == "model":
-                self.pipe.enable_model_cpu_offload()
-            else:
-                raise ValueError(f"Unknown cpu offload option: {cpu_offload}")
-        else:
-            self.pipe.to("cuda")
-        # enable attention slicing and xformers memory efficient attention
-        try:
-            self.pipe.enable_xformers_memory_efficient_attention()
-        except Exception as e:
-            print(e)
-            print("Xformers is not enabled")
-        self.pipe.enable_attention_slicing()
-
-    def infer(
-        self,
-        video: str,
-        num_denoising_steps: int,
-        guidance_scale: float,
-        save_folder: str = "./demo_output",
-        window_size: int = 110,
-        process_length: int = 195,
-        overlap: int = 25,
-        max_res: int = 1024,
-        dataset: str = "open",
-        target_fps: int = 15,
-        seed: int = 42,
-        track_time: bool = True,
-        save_npz: bool = False,
-        save_exr: bool = False,
-    ):
-        set_seed(seed)
-
-        frames, target_fps = read_video_frames(
-            video,
-            process_length,
-            target_fps,
-            max_res,
-            dataset,
-        )
-        # inference the depth map using the DepthCrafter pipeline
-        with torch.inference_mode():
-            res = self.pipe(
-                frames,
-                height=frames.shape[1],
-                width=frames.shape[2],
-                output_type="np",
-                guidance_scale=guidance_scale,
-                num_inference_steps=num_denoising_steps,
-                window_size=window_size,
-                overlap=overlap,
-                track_time=track_time,
-            ).frames[0]
-        # convert the three-channel output to a single channel depth map
-        res = res.sum(-1) / res.shape[-1]
-        # normalize the depth map to [0, 1] across the whole video
-        res = (res - res.min()) / (res.max() - res.min())
-        # visualize the depth map and save the results
-        vis = vis_sequence_depth(res)
-        # save the depth map and visualization with the target FPS
-        save_path = os.path.join(
-            save_folder, os.path.splitext(os.path.basename(video))[0]
-        )
-        os.makedirs(os.path.dirname(save_path), exist_ok=True)
-        save_video(res, save_path + "_depth.mp4", fps=target_fps)
-        save_video(vis, save_path + "_vis.mp4", fps=target_fps)
-        save_video(frames, save_path + "_input.mp4", fps=target_fps)
-        if save_npz:
-            np.savez_compressed(save_path + ".npz", depth=res)
-        if save_exr:
-            import OpenEXR
-            import Imath
-
-            os.makedirs(save_path, exist_ok=True)
-            print(f"==> saving EXR results to {save_path}")
-            # Iterate over each frame and save as a separate EXR file
-            for i, frame in enumerate(res):
-                output_exr = f"{save_path}/frame_{i:04d}.exr"
-
-                # Prepare EXR header for each frame
-                header = OpenEXR.Header(frame.shape[1], frame.shape[0])
-                header["channels"] = {
-                    "Z": Imath.Channel(Imath.PixelType(Imath.PixelType.FLOAT))
-                }
-
-                # Create EXR file and write the frame
-                exr_file = OpenEXR.OutputFile(output_exr, header)
-                exr_file.writePixels({"Z": frame.tobytes()})
-                exr_file.close()
-
-        return [
-            save_path + "_input.mp4",
-            save_path + "_vis.mp4",
-            save_path + "_depth.mp4",
-        ]
-
-    def run(
-        self,
-        input_video,
-        num_denoising_steps,
-        guidance_scale,
-        max_res=1024,
-        process_length=195,
-    ):
-        res_path = self.infer(
-            input_video,
-            num_denoising_steps,
-            guidance_scale,
-            max_res=max_res,
-            process_length=process_length,
-        )
-        # clear the cache for the next video
-        gc.collect()
-        torch.cuda.empty_cache()
-        return res_path[:2]
+logging.basicConfig(level=logging.INFO)
 
 
 def main(
@@ -172,7 +25,29 @@ def main(
     save_exr: bool = False,
     track_time: bool = False,
 ):
-    depthcrafter_demo = DepthCrafterDemo(
+    """
+    Main function to run DepthCrafter inference.
+
+    Args:
+        video_path (str): Path to the input video(s), separated by comma.
+        save_folder (str): Folder to save output.
+        unet_path (str): Path to the UNet model.
+        pre_train_path (str): Path to the pre-trained model.
+        process_length (int): Maximum number of frames to process.
+        cpu_offload (str): CPU offload strategy.
+        target_fps (int): Target FPS for output video.
+        seed (int): Random seed.
+        num_inference_steps (int): Number of denoising steps.
+        guidance_scale (float): Guidance scale.
+        window_size (int): Window size for sliding window inference.
+        overlap (int): Overlap between windows.
+        max_res (int): Maximum resolution.
+        dataset (str): Dataset name for resolution settings.
+        save_npz (bool): Whether to save depth map as .npz.
+        save_exr (bool): Whether to save depth map as .exr.
+        track_time (bool): Whether to track execution time.
+    """
+    depthcrafter_inference = DepthCrafterInference(
         unet_path=unet_path,
         pre_train_path=pre_train_path,
         cpu_offload=cpu_offload,
@@ -180,7 +55,7 @@ def main(
     # process the videos, the video paths are separated by comma
     video_paths = video_path.split(",")
     for video in video_paths:
-        depthcrafter_demo.infer(
+        depthcrafter_inference.infer(
             video,
             num_inference_steps,
             guidance_scale,
@@ -196,14 +71,8 @@ def main(
             save_npz=save_npz,
             save_exr=save_exr,
         )
-        # clear the cache for the next video
-        gc.collect()
-        torch.cuda.empty_cache()
+        depthcrafter_inference.clear_cache()
 
 
 if __name__ == "__main__":
-    # running configs
-    # the most important arguments for memory saving are `cpu_offload`, `enable_xformers`, `max_res`, and `window_size`
-    # the most important arguments for trade-off between quality and speed are
-    # `num_inference_steps`, `guidance_scale`, and `max_res`
     Fire(main)

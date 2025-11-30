@@ -1,13 +1,18 @@
-from typing import Union, Tuple
+from typing import Tuple, Union
 
 import torch
 from diffusers import UNetSpatioTemporalConditionModel
-from diffusers.models.unets.unet_spatio_temporal_condition import UNetSpatioTemporalConditionOutput
+from diffusers.models.unets.unet_spatio_temporal_condition import (
+    UNetSpatioTemporalConditionOutput,
+)
 
 
 class DiffusersUNetSpatioTemporalConditionModelDepthCrafter(
     UNetSpatioTemporalConditionModel
 ):
+    """
+    UNet model for DepthCrafter with Spatio-Temporal Condition.
+    """
 
     def forward(
         self,
@@ -17,6 +22,19 @@ class DiffusersUNetSpatioTemporalConditionModelDepthCrafter(
         added_time_ids: torch.Tensor,
         return_dict: bool = True,
     ) -> Union[UNetSpatioTemporalConditionOutput, Tuple]:
+        """
+        Forward pass of the UNet model.
+
+        Args:
+            sample (torch.Tensor): Input sample.
+            timestep (Union[torch.Tensor, float, int]): Timestep.
+            encoder_hidden_states (torch.Tensor): Encoder hidden states.
+            added_time_ids (torch.Tensor): Added time IDs.
+            return_dict (bool): Whether to return a dictionary.
+
+        Returns:
+            Union[UNetSpatioTemporalConditionOutput, Tuple]: Output of the UNet.
+        """
 
         # 1. time
         timesteps = timestep
@@ -103,7 +121,7 @@ class DiffusersUNetSpatioTemporalConditionModelDepthCrafter(
         )
 
         # 5. up
-        for i, upsample_block in enumerate(self.up_blocks):
+        for _, upsample_block in enumerate(self.up_blocks):
             res_samples = down_block_res_samples[-len(upsample_block.resnets) :]
             down_block_res_samples = down_block_res_samples[
                 : -len(upsample_block.resnets)

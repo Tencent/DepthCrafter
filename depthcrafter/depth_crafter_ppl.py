@@ -2,20 +2,22 @@ from typing import Callable, Dict, List, Optional, Union
 
 import numpy as np
 import torch
-
 from diffusers.pipelines.stable_video_diffusion.pipeline_stable_video_diffusion import (
-    _resize_with_antialiasing,
-    StableVideoDiffusionPipelineOutput,
     StableVideoDiffusionPipeline,
+    StableVideoDiffusionPipelineOutput,
+    _resize_with_antialiasing,
     retrieve_timesteps,
 )
 from diffusers.utils import logging
 from diffusers.utils.torch_utils import randn_tensor
 
-logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
+logger = logging.get_logger(__name__)
 
 
 class DepthCrafterPipeline(StableVideoDiffusionPipeline):
+    """
+    Pipeline for DepthCrafter.
+    """
 
     @torch.inference_mode()
     def encode_video(
@@ -24,11 +26,15 @@ class DepthCrafterPipeline(StableVideoDiffusionPipeline):
         chunk_size: int = 14,
     ) -> torch.Tensor:
         """
-        :param video: [b, c, h, w] in range [-1, 1], the b may contain multiple videos or frames
-        :param chunk_size: the chunk size to encode video
-        :return: image_embeddings in shape of [b, 1024]
-        """
+        Encode video into image embeddings.
 
+        Args:
+            video (torch.Tensor): Input video tensor [b, c, h, w] in range [-1, 1].
+            chunk_size (int): Chunk size for encoding.
+
+        Returns:
+            torch.Tensor: Image embeddings in shape [b, 1024].
+        """
         video_224 = _resize_with_antialiasing(video.float(), (224, 224))
         video_224 = (video_224 + 1.0) / 2.0  # [-1, 1] -> [0, 1]
 
@@ -52,11 +58,16 @@ class DepthCrafterPipeline(StableVideoDiffusionPipeline):
         self,
         video: torch.Tensor,
         chunk_size: int = 14,
-    ):
+    ) -> torch.Tensor:
         """
-        :param video: [b, c, h, w] in range [-1, 1], the b may contain multiple videos or frames
-        :param chunk_size: the chunk size to encode video
-        :return: vae latents in shape of [b, c, h, w]
+        Encode video into VAE latents.
+
+        Args:
+            video (torch.Tensor): Input video tensor [b, c, h, w] in range [-1, 1].
+            chunk_size (int): Chunk size for encoding.
+
+        Returns:
+            torch.Tensor: VAE latents in shape [b, c, h, w].
         """
         video_latents = []
         for i in range(0, video.shape[0], chunk_size):
@@ -67,16 +78,21 @@ class DepthCrafterPipeline(StableVideoDiffusionPipeline):
         return video_latents
 
     @staticmethod
-    def check_inputs(video, height, width):
+    def check_inputs(video: Union[torch.Tensor, np.ndarray], height: int, width: int):
         """
-        :param video:
-        :param height:
-        :param width:
-        :return:
+        Check input validity.
+
+        Args:
+            video (Union[torch.Tensor, np.ndarray]): Input video.
+            height (int): Height of the video.
+            width (int): Width of the video.
+
+        Raises:
+            ValueError: If inputs are invalid.
         """
         if not isinstance(video, torch.Tensor) and not isinstance(video, np.ndarray):
             raise ValueError(
-                f"Expected `video` to be a `torch.Tensor` or `VideoReader`, but got a {type(video)}"
+                f"Expected `video` to be a `torch.Tensor` or `np.ndarray`, but got a {type(video)}"
             )
 
         if height % 8 != 0 or width % 8 != 0:
@@ -99,31 +115,39 @@ class DepthCrafterPipeline(StableVideoDiffusionPipeline):
         latents: Optional[torch.FloatTensor] = None,
         output_type: Optional[str] = "pil",
         callback_on_step_end: Optional[Callable[[int, int, Dict], None]] = None,
-        callback_on_step_end_tensor_inputs: List[str] = ["latents"],
+        callback_on_step_end_tensor_inputs: Optional[List[str]] = None,
         return_dict: bool = True,
         overlap: int = 25,
         track_time: bool = False,
     ):
         """
-        :param video: in shape [t, h, w, c] if np.ndarray or [t, c, h, w] if torch.Tensor, in range [0, 1]
-        :param height:
-        :param width:
-        :param num_inference_steps:
-        :param guidance_scale:
-        :param window_size: sliding window processing size
-        :param fps:
-        :param motion_bucket_id:
-        :param noise_aug_strength:
-        :param decode_chunk_size:
-        :param generator:
-        :param latents:
-        :param output_type:
-        :param callback_on_step_end:
-        :param callback_on_step_end_tensor_inputs:
-        :param return_dict:
-        :return:
+        Run the pipeline for depth estimation.
+
+        Args:
+            video (Union[np.ndarray, torch.Tensor]):
+                Input video. Shape [t, h, w, c] if np.ndarray or [t, c, h, w] if torch.Tensor, in range [0, 1].
+            height (int): Height of the output.
+            width (int): Width of the output.
+            num_inference_steps (int): Number of denoising steps.
+            guidance_scale (float): Guidance scale.
+            window_size (Optional[int]): Sliding window processing size.
+            noise_aug_strength (float): Strength of noise augmentation.
+            decode_chunk_size (Optional[int]): Chunk size for decoding.
+            generator (Optional[Union[torch.Generator, List[torch.Generator]]]): Random number generator.
+            latents (Optional[torch.FloatTensor]): Pre-generated latents.
+            output_type (Optional[str]): Output type ("pil", "np", "latent").
+            callback_on_step_end (Optional[Callable[[int, int, Dict], None]]): Callback function.
+            callback_on_step_end_tensor_inputs (List[str]): Inputs for the callback.
+            return_dict (bool): Whether to return a dictionary.
+            overlap (int): Overlap between windows.
+            track_time (bool): Whether to track execution time.
+
+        Returns:
+            Union[StableVideoDiffusionPipelineOutput, torch.Tensor]: Output of the pipeline.
         """
         # 0. Default height and width to unet
+        if callback_on_step_end_tensor_inputs is None:
+            callback_on_step_end_tensor_inputs = ["latents"]
         height = height or self.unet.config.sample_size * self.vae_scale_factor
         width = width or self.unet.config.sample_size * self.vae_scale_factor
         num_frames = video.shape[0]
