@@ -174,8 +174,50 @@ cd DepthCrafter
 uv venv
 source .venv/bin/activate
 uv sync
+uv pip install PyQt5
 uv pip list
 ```
+
+## 📦 uv Installation Guide (Windows)
+For Windows users who need to install uv, follow these steps:
+
+Open Command Prompt (Run as Administrator) and execute these commands.
+
+1. Create installation directory
+mkdir "C:\Program Files\uv"
+
+
+2. Download uv
+curl -L https://github.com/astral-sh/uv/releases/latest/download/uv-x86_64-pc-windows-msvc.zip -o "%TEMP%\uv.zip"
+
+
+3. Extract ZIP
+tar -xf "%TEMP%\uv.zip" -C "%TEMP%"
+
+
+4. Copy executables
+copy /Y "%TEMP%\uv.exe" "C:\Program Files\uv\uv.exe"
+copy /Y "%TEMP%\uvx.exe" "C:\Program Files\uv\uvx.exe"
+
+
+5. Add to system PATH
+setx /M PATH "%PATH%;C:\Program Files\uv"
+
+
+6. Verify
+
+Close CMD, open a new CMD window:
+where uv
+uv --version
+uvx --version
+
+
+Expected location:
+C:\Program Files\uv\uv.exe
+C:\Program Files\uv\uvx.exe
+
+
+Note: Run the installation commands as Administrator. uv will then be accessible to all Windows users.
 
 
 
@@ -196,6 +238,13 @@ uv pip list
     ```bash
     python run.py  --video-path examples/example_01.mp4 --max-res 512
     ```
+
+### 🖥️ Running the UI Application
+To launch the graphical user interface, you can use the `Launcher.bat` file:
+```batch
+Launcher.bat
+```
+This will activate the virtual environment and run the UI application.
 
 ## 🚀 Dataset Evaluation
 Please check the `benchmark` folder.

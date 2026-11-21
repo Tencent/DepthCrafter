@@ -1,28 +1,39 @@
 [project]
 name = "depthcrafter"
 version = "1.0.1"
-description = "Generating Consistent Long Depth Sequences for Open-world Videos"
+description = "Generating Consistent Long Depth Sequences for Open-world Videos (RTX 5090 compatible)"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "accelerate>=1.12.0",
-    "decord>=0.6.0",
-    "diffusers>=0.35.2",
-    "fire>=0.7.1",
-    "gradio>=6.0.1",
-    "huggingface-hub>=0.36.0",
-    "matplotlib>=3.10.7",
-    "mediapy>=1.2.4",
-    "pytest>=9.0.1",
-    "torch>=2.7.1",
-    "torchaudio>=2.7.1",
-    "torchvision>=0.22.1",
-    "transformers>=4.57.3",
-    "xformers>=0.0.31.post1",
+"accelerate>=1.12.0",
+"decord>=0.6.0",
+"diffusers>=0.35.2",
+"fire>=0.7.1",
+"gradio>=6.0.1,<6.18.0",
+"huggingface-hub>=0.36.0",
+"matplotlib>=3.10.7",
+"mediapy>=1.2.4",
+"opencv-python>=5.1.0.95",
+"OpenImageIO",
+"pytest>=9.0.1",
+"torch>=2.1.0",
+"torchvision>=0.16.0",
+"torchaudio>=2.1.0",
+"transformers>=4.57.3",
 ]
 
+[tool.uv]
+prerelease = "allow"
+index-strategy = "unsafe-best-match"
+
 [[tool.uv.index]]
-url = "https://download.pytorch.org/whl/cu118"
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu128"
+
+[tool.uv.sources]
+torch = { index = "pytorch" }
+torchvision = { index = "pytorch" }
+torchaudio = { index = "pytorch" }
 
 [tool.pytest.ini_options]
 pythonpath = "."
