@@ -139,8 +139,8 @@ class DepthCrafterInference:
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
         save_video(res, save_path + "_depth.mp4", fps=target_fps)
-        save_video(vis, save_path + "_vis.mp4", fps=target_fps)
-        save_video(frames, save_path + "_input.mp4", fps=target_fps)
+        # save_video(vis, save_path + "_vis.mp4", fps=target_fps)
+        # save_video(frames, save_path + "_input.mp4", fps=target_fps)
 
         if save_npz:
             np.savez_compressed(save_path + ".npz", depth=res)
@@ -149,8 +149,8 @@ class DepthCrafterInference:
             self._save_exr(res, save_path)
 
         return [
-            save_path + "_input.mp4",
-            save_path + "_vis.mp4",
+            # save_path + "_input.mp4",
+            # save_path + "_vis.mp4",
             save_path + "_depth.mp4",
         ]
 
@@ -169,7 +169,7 @@ class DepthCrafterInference:
         logger.info(f"Saving EXR results to {save_path}")
 
         for i, frame in enumerate(res):
-            output_exr = f"{save_path}/frame_{i:04d}.exr"
+            output_exr = f"{save_path}/{os.path.basename(save_path)}.{i+1:04d}.exr"
             header = OpenEXR.Header(frame.shape[1], frame.shape[0])
             header["channels"] = {
                 "Z": Imath.Channel(Imath.PixelType(Imath.PixelType.FLOAT))
